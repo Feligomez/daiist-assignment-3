@@ -10,3 +10,4 @@ Write the per-file steps as functions (e.g. `chunk_file(path)`,
 """
 
 raise NotImplementedError("Write your index stage.")
+x
