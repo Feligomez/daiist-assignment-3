@@ -4,7 +4,7 @@
 - **Student ID**: [TODO]
 - **Group**: [TODO: BBADBA 5A | BBADBA 5B | PPLEDBA 5A]
 
-> Draft. Every `[TODO]` needs a number from `eval/summary.md`, `eval/retrieval.csv`, `index/stats.json` or your own run. Do not keep any sentence you have not checked against your results.
+> Draft. Every `[TODO]` needs a number from `eval/summary.md`, `eval/retrieval.csv`, `index/stats.json` or your own run. Do not keep any sentence you have not checked against your results. Corpus, chunk and retrieval numbers are now filled in from `index/stats.json` and `eval/retrieval.csv`.
 
 ## Use case
 
@@ -16,10 +16,10 @@ A wrong answer is expensive: a wrong breach deadline or a wrong "no consent need
 
 | Document | Source name | URL | Date | Licence | Words |
 |---|---|---|---|---|---|
-| Regulation (EU) 2016/679 (GDPR) | GDPR | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679 | 27.4.2016 | EU legal texts, reuse allowed (Commission Decision 2011/833/EU) | [TODO from index/stats.json] |
-| Directive (EU) 2016/680 (Law Enforcement Directive) | LED | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016L0680 | 27.4.2016 | same | [TODO] |
-| Directive 2002/58/EC (ePrivacy), consolidated 19.12.2009 | ePrivacy | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02002L0058-20091219 | 19.12.2009 | same | [TODO] |
-| **Total** | | | | | [TODO, must be >= 50,000] |
+| Regulation (EU) 2016/679 (GDPR) | GDPR | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679 | 27.4.2016 | EU legal texts, reuse allowed (Commission Decision 2011/833/EU) | 52,902 |
+| Directive (EU) 2016/680 (Law Enforcement Directive) | LED | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016L0680 | 27.4.2016 | same | 25,791 |
+| Directive 2002/58/EC (ePrivacy), consolidated 19.12.2009 | ePrivacy | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02002L0058-20091219 | 19.12.2009 | same | 4,774 |
+| **Total** | | | | | **83,467** |
 
 Legislation contains no personal data. The consolidated ePrivacy text is used because the cookie-consent rule in Art. 5(3) comes from the 2009 amendment.
 
@@ -27,9 +27,9 @@ Legislation contains no personal data. The consolidated ePrivacy text is used be
 
 `index.py` downloads each act as HTML into `corpus/`, extracts the text with BeautifulSoup and cleans it: non-breaking spaces normalised, consolidation markers (the arrow + "M2" codes in consolidated texts) removed, and point labels such as "(a)" or "2." glued to the text that follows them.
 
-Extraction problem fixed: EUR-Lex puts footnote markers like "(1)" in their own HTML elements, so a plain `get_text("\n")` placed them on separate lines in the middle of sentences, where they looked like recital numbers and split recitals in the wrong place. The fix removes the footnote markers and footnote bodies before extracting text, unwraps inline tags so a sentence stays on one line, and only accepts a recital number if it is the next one in sequence. [TODO: check on your output, e.g. that GDPR has 173 recitals and 99 articles in index/stats.json, and mention any other problem you saw.]
+Extraction problem fixed: EUR-Lex puts footnote markers like "(1)" in their own HTML elements, so a plain `get_text("\n")` placed them on separate lines in the middle of sentences, where they looked like recital numbers and split recitals in the wrong place. The fix removes the footnote markers and footnote bodies before extracting text, unwraps inline tags so a sentence stays on one line, and only accepts a recital number if it is the next one in sequence. Check against `index/stats.json`: GDPR 173 recitals and 99 articles, LED 107 recitals and 65 articles, matching the official texts. The consolidated ePrivacy text gives 0 recitals and 23 articles, because EUR-Lex consolidated versions leave out the recitals. [TODO: mention any other problem you saw.]
 
-Chunking follows the structure of the law: one chunk per recital and one per article; articles over 350 words are split at paragraph boundaries into parts (a short last part is merged back). Each chunk starts with a header line "GDPR Article 33 - Notification of a personal data breach to the supervisory authority" that is embedded with it. Metadata: `source`, `location` ("Article 33" / "Recital 85"), `heading`, `chapter`, `kind` (article/recital), `part`, `file`, `words`. Number of chunks: [TODO from index/stats.json].
+Chunking follows the structure of the law: one chunk per recital and one per article; articles over 350 words are split at paragraph boundaries into parts (a short last part is merged back). Each chunk starts with a header line "GDPR Article 33 - Notification of a personal data breach to the supervisory authority" that is embedded with it. Metadata: `source`, `location` ("Article 33" / "Recital 85"), `heading`, `chapter`, `kind` (article/recital), `part`, `file`, `words`. Number of chunks: 527 (GDPR 317, LED 183, ePrivacy 27).
 
 Vectors: `gemini-embedding-2`, 768 dimensions, normalised, stored in ChromaDB under `index/chroma/` in batches of 50 as soon as they arrive. Chunk ids contain a hash of the text, so `main.py index` only embeds chunks without a saved vector, and stops cleanly if the daily quota runs out.
 
@@ -47,12 +47,12 @@ All designs use the same chunks and vectors, so comparing them cost no extra emb
 
 | Design | hit@1 | hit@3 | hit@5 | multi: both passages @5 | words added (k=5) |
 |---|---|---|---|---|---|
-| dense (Gemini embeddings) | [TODO] | | | | |
-| BM25 (keywords) | [TODO] | | | | |
-| hybrid (RRF of dense + BM25) | [TODO] | | | | |
-| hybrid, articles only (metadata filter) | [TODO] | | | | |
+| dense (Gemini embeddings) | 0.625 | 0.969 | 1.000 | 3/6 | 1122 |
+| BM25 (keywords) | 0.375 | 0.531 | 0.562 | 1/6 | 1031 |
+| hybrid (RRF of dense + BM25) | 0.531 | 0.656 | 0.781 | 1/6 | 1145 |
+| hybrid, articles only (metadata filter) | 0.625 | 0.844 | 0.938 | 2/6 | 1344 |
 
-Chosen design: [TODO: pick by the numbers; `retrieval.py` defaults to `hybrid`. If another design wins, change `DEFAULT_MODE` and explain why.] k = 5 for the tool.
+Chosen design: dense (`DEFAULT_MODE = "dense"` in `retrieval.py`). It has the best hit rate at every k (tied at hit@1 with hybrid articles-only), finds both passages for the most multi questions (3/6), and adds fewer words than either hybrid variant. Adding BM25 made results worse on these questions. [TODO: explain in your own words why BM25 hurts here, and what it means that only 3/6 multi questions get both passages.] k = 5 for the tool.
 
 ## Tools and subagent
 
@@ -114,4 +114,4 @@ Cost and latency per question: [TODO] tokens, [TODO] s, about $[TODO] at paid-ti
 
 ## AI use
 
-[TODO: describe your real use.] An AI assistant (Claude) wrote the code of `index.py`, `retrieval.py`, `server.py`, `agent.py` and `evaluate.py`, plus drafts of `AGENTS.md`, the subagent instructions, `eval/questions.csv`, the judge rubric and this report's structure. [TODO: say which of these you reviewed, changed or replaced, and confirm that the decisions, test set, human grades and analysis are your own.]
+[TODO: describe your real use.] An AI assistant (Claude) wrote the code of `index.py`, `retrieval.py`, `server.py`, `agent.py` and `evaluate.py`, plus drafts of `AGENTS.md`, the subagent instructions, `eval/questions.csv`, the judge rubric and this report's structure, and filled in the corpus, chunk and retrieval numbers from `index/stats.json` and `eval/retrieval.csv`. [TODO: say which of these you reviewed, changed or replaced, and confirm that the decisions, test set, human grades and analysis are your own.]
