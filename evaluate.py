@@ -195,7 +195,7 @@ def run_agent(rows: list[dict], fresh: bool) -> dict:
         ANSWERS.unlink()
     answers = load_jsonl(ANSWERS)
     for r in rows:
-        if r["id"] in answers:
+        if r["id"] in answers or os.environ.get("EVAL_CACHED_ONLY"):  # partial run: only use saved answers
             continue
         log(f"[{r['id']}] {r['question']}")
         try:
