@@ -79,6 +79,16 @@ def download(name: str, url: str) -> Path:
         return path
     log(f"Downloading {name} from EUR-Lex ...")
     response = httpx.get(url, headers=HEADERS, follow_redirects=True, timeout=120)
+    if "Article 1" not in response.text.replace("\xa0", " ") and "CELEX:" in url:
+        # EUR-Lex shows a bot check to cloud machines (e.g. Codespaces, CI). The EU
+        # Publications Office (Cellar) serves the same official text by CELEX number.
+        celex = url.split("CELEX:")[1]
+        response = httpx.get(
+            f"https://publications.europa.eu/resource/celex/{celex}",
+            headers={"Accept": "application/xhtml+xml", "Accept-Language": "eng"},
+            follow_redirects=True,
+            timeout=120,
+        )
     response.raise_for_status()
     if "Article 1" not in response.text.replace("\xa0", " "):
         raise RuntimeError(
@@ -348,7 +358,8 @@ def embed_texts(texts: list[str], task: str = "RETRIEVAL_DOCUMENT") -> list[list
         config = (types.EmbedContentConfig(task_type=task, output_dimensionality=EMBED_DIM)
                   if _use_task_type else types.EmbedContentConfig(output_dimensionality=EMBED_DIM))
         try:
-            result = gemini().models.embed_content(model=EMBED_MODEL, contents=texts, config=config)
+            result = gemini().models.embed_content(model=EMBED_MODEL, contents=[types.Content(parts=[types.Part(text=t)]) for t in texts],  # one Content per text: gemini-embedding-2 merges a plain list of strings into ONE vector
+                config=config)
             return [list(e.values) for e in result.embeddings]
         except errors.ClientError as error:
             message = str(error)
