@@ -207,7 +207,7 @@ def run_agent(rows: list[dict], fresh: bool) -> dict:
         answers[r["id"]] = result
         with ANSWERS.open("a", encoding="utf-8") as f:
             f.write(json.dumps(result, ensure_ascii=False) + "\n")
-        time.sleep(2)  # stay under the free-tier requests per minute
+        time.sleep(25)  # stay under the free-tier requests per minute
     return answers
 
 
