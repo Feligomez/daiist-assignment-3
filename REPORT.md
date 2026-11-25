@@ -1,8 +1,8 @@
 # Assignment 3 Report
 
-- **Name**: [TODO]
-- **Student ID**: [TODO]
-- **Group**: [TODO: BBADBA 5A | BBADBA 5B | PPLEDBA 5A]
+- **Name**: Felipe Gómez
+- **Student ID**: 19369
+- **Group**: BBADBA 5B 
 
 > Draft. Every `[TODO]` needs a number from `eval/summary.md`, `eval/retrieval.csv`, `index/stats.json` or your own run. Do not keep any sentence you have not checked against your results. Corpus, chunk and retrieval numbers are now filled in from `index/stats.json` and `eval/retrieval.csv`.
 
