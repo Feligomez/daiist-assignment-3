@@ -47,7 +47,7 @@ SUMMARY_MD = EVAL / "summary.md"
 SUMMARY_JSON = EVAL / "summary.json"
 BEFORE_AFTER = EVAL / "before_after.md"
 
-JUDGE_MODEL = os.environ.get("JUDGE_MODEL", os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"))
+JUDGE_MODEL = os.environ.get("JUDGE_MODEL", os.environ.get("GEMINI_MODEL", "gemini-3.6-flash"))
 PRICE_IN, PRICE_OUT = 0.30, 2.50  # USD per million tokens on the paid tier, for the cost estimate
 KS = (1, 3, 5)
 DESIGNS = {

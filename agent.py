@@ -31,7 +31,7 @@ from api_key import load_api_key
 from retrieval import parse_results
 
 ROOT = Path(__file__).resolve().parent
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
 MAX_TOOL_CALLS = 6
 MAX_MODEL_CALLS = 8
 REFUSAL = "The corpus does not cover this."
@@ -125,7 +125,7 @@ def make_tool(session, tool, trace: list, retrieved: list, counter: dict, approv
         return text
 
     return StructuredTool(name=tool.name, description=tool.description or "",
-                          args_schema=tool.inputSchema, coroutine=call)
+                          args_schema=getattr(tool, "input_schema", None) or getattr(tool, "inputSchema"), coroutine=call)
 
 
 async def run(question: str, approve_fn=approve) -> dict:
