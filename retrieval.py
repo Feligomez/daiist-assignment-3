@@ -20,7 +20,7 @@ import numpy as np
 
 import index as pipeline
 
-DEFAULT_MODE = "hybrid"  # chosen from the retrieval evaluation (see REPORT.md); change if your numbers disagree
+DEFAULT_MODE = "dense"  # chosen from the retrieval evaluation (see REPORT.md); change if your numbers disagree
 MODES = ("dense", "bm25", "hybrid")
 RRF_K = 60
 CANDIDATES = 50
