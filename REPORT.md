@@ -114,4 +114,5 @@ Cost and latency per question: 4433 tokens, 7.4 s, about $0.00187 at paid-tier p
 
 ## AI use
 
-My teacher allowed AI for this practice assignment, and I used it for most of the work. Claude (an AI assistant, in Claude Code and then in my browser) wrote the code, ran the evaluation on GitHub Actions, filled in the numbers, and drafted the analysis parts of this report (BM25 explanation, rubric reason, disagreements, failures, what to fix first, decision) from the real result files. I chose the use case, wrote the test set with AI help, and graded 22 answers myself before seeing the judge. An AI assistant (Claude) wrote the code of `index.py`, `retrieval.py`, `server.py`, `agent.py` and `evaluate.py`, plus drafts of `AGENTS.md`, the subagent instructions, `eval/questions.csv/.
+Claude was used to help the fullfilment of this project
+
