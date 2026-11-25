@@ -35,7 +35,7 @@ Vectors: `gemini-embedding-2`, 768 dimensions, normalised, stored in ChromaDB un
 
 ## Test set
 
-[TODO: say in your own words how you wrote it.] 38 questions in `eval/questions.csv`, written from the articles before tuning: 26 `single`, 6 `multi` (two passages, sometimes from two acts), 6 `unanswerable` (close to the topic: AI Act fines, Meta's 2023 fine, registration fees, a never-adopted ePrivacy Regulation, the Data Act, the free flow of non-personal data Regulation).
+I wrote 38 questions with ai help that can be answered somewhere in the law.The bot will find two different bits of the law and combine them. That checks whether it can join the information. Laws can't answer questions: the answer isn't in GDPR, LED or ePrivacy at all. A good bot should say "I don't know." A bad bot makes something up. I wrote 38 questions in `eval/questions.csv`, written from the articles before tuning: 26 `single`, 6 `multi` (two passages, sometimes from two acts), 6 `unanswerable` (close to the topic: AI Act fines, Meta's 2023 fine, registration fees, a never-adopted ePrivacy Regulation, the Data Act, the free flow of non-personal data Regulation).
 
 Examples:
 - q01 (single): "How long do we have to notify the supervisory authority after we discover a personal data breach?" -> GDPR Article 33, 72 hours where feasible.
@@ -44,6 +44,8 @@ Examples:
 ## Retrieval
 
 All designs use the same chunks and vectors, so comparing them cost no extra embeddings (only 32 query embeddings, cached in `index/query_cache.json`).
+
+BM25 only matches exact words. In these laws, words like 'controller' and 'processing' are in almost every article, so they don't help tell articles apart, and BM25 often ranked the wrong article first (hit@1 of 0.375 vs 0.625 for dense). It also misses the right article when the question is worded differently from the law. Dense retrieval compares meaning, so it handled this much better.
 
 | Design | hit@1 | hit@3 | hit@5 | multi: both passages @5 | words added (k=5) |
 |---|---|---|---|---|---|
@@ -114,4 +116,4 @@ Cost and latency per question: [TODO] tokens, [TODO] s, about $[TODO] at paid-ti
 
 ## AI use
 
-[TODO: describe your real use.] An AI assistant (Claude) wrote the code of `index.py`, `retrieval.py`, `server.py`, `agent.py` and `evaluate.py`, plus drafts of `AGENTS.md`, the subagent instructions, `eval/questions.csv`, the judge rubric and this report's structure, and filled in the corpus, chunk and retrieval numbers from `index/stats.json` and `eval/retrieval.csv`. [TODO: say which of these you reviewed, changed or replaced, and confirm that the decisions, test set, human grades and analysis are your own.]
+[TODO: describe your real use.] An AI assistant (Claude) wrote the code of `index.py`, `retrieval.py`, `server.py`, `agent.py` and `evaluate.py`, plus drafts of `AGENTS.md`, the subagent instructions, `eval/questions.csv/.
