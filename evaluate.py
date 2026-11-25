@@ -265,8 +265,8 @@ def judge_one(row: dict, res: dict) -> dict:
                 "judge_reason": str(data.get("reason", "")).strip(),
                 "judge_tokens": getattr(usage, "total_token_count", 0) or 0,
             }
-        except errors.ClientError as error:
-            if error.code == 429:
+        except (errors.ClientError, errors.ServerError) as error:
+            if error.code in (429, 500, 503):
                 log(f"  judge rate limited, waiting {30 * attempt}s")
                 time.sleep(30 * attempt)
                 continue
