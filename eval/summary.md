@@ -26,4 +26,5 @@
 
 ## Judge vs your labels
 
-- No human labels yet: run `uv run python evaluate.py --label`.
+- correct: 91% agreement on 22 answers (Cohen's kappa 0.0); disagree on q18, q28
+- supported: 96% agreement on 22 answers (Cohen's kappa 0.0); disagree on q30

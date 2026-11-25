@@ -16,7 +16,25 @@
   "avg_tokens_per_question": 4433,
   "avg_seconds_per_question": 7.4,
   "est_cost_per_question_usd": 0.00187,
-  "judge_human_agreement": {},
+  "judge_human_agreement": {
+    "correct": {
+      "n": 22,
+      "agreement": 0.909,
+      "cohen_kappa": 0.0,
+      "disagree_on": [
+        "q18",
+        "q28"
+      ]
+    },
+    "supported": {
+      "n": 22,
+      "agreement": 0.955,
+      "cohen_kappa": 0.0,
+      "disagree_on": [
+        "q30"
+      ]
+    }
+  },
   "retrieval": [
     {
       "design": "dense",
