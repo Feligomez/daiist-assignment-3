@@ -72,7 +72,7 @@ Transcript from Claude Code / Copilot: [TODO: run the subagent on one question a
 
 If a file whose name (source) is already indexed is added again with the same content, the chunk ids match and nothing is embedded ("already indexed", no quota spent). If the content changed, only the changed chunks are embedded and the outdated ones deleted ("updated").
 
-Unanswerable question q36 (repeal of data localisation requirements). Document added: Regulation (EU) 2018/1807 on the free flow of non-personal data. `evaluate.py` adds it with the `add_document` tool to a temporary copy of the index so the committed index and the other results are not changed. Before / after: [TODO: copy from eval/before_after.md.]
+Unanswerable question q36 (repeal of data localisation requirements). Document added: Regulation (EU) 2018/1807 on the free flow of non-personal data. `evaluate.py` adds it with the `add_document` tool to a temporary copy of the index so the committed index and the other results are not changed. Before / after: before adding it, the agent answered "The corpus does not cover this." and pointed to [LED, Article 63] as the closest passage (a correct refusal). The first add_document call returned "added" with 49 chunks embedded; a second call with the same file returned "already indexed" with 0 embedded. After adding it, the agent answered that existing data localisation requirements had to be repealed by 30 May 2021 [FreeFlow, Article 4], which matches the reference answer. Full text in eval/before_after.md.
 
 ## Harness and guardrails
 
@@ -82,7 +82,7 @@ AGENTS.md rules (each with its reason in the file): search before answering; ans
 
 Approval: `add_document` runs only after a person types "y" at the terminal; with no terminal (evaluation) it is denied. Call limits: 6 tool calls and 8 model calls per question.
 
-Extra guardrail, citation check: every `[source, location]` in the answer must match a passage the search tool returned in this run. If an answer is not a refusal and has no valid citation, it is withheld and replaced by a refusal; invalid citations are listed under the answer. Case where it fired: [TODO: from eval/results.csv, column `guardrail`.]
+Extra guardrail, citation check: every `[source, location]` in the answer must match a passage the search tool returned in this run. If an answer is not a refusal and has no valid citation, it is withheld and replaced by a refusal; invalid citations are listed under the answer. Case where it fired: q30. One citation in the answer did not match any passage the search tool returned, so it was listed as invalid under the answer; the answer itself was kept because its other citations were valid.
 
 ## Evaluation
 
@@ -90,9 +90,9 @@ Code checks (`evaluate.py`): refusal detected on unanswerable questions, wrong r
 
 Judge (`JUDGE_MODEL`, temperature 0) sees the question, its type, the reference answer, the retrieved passages and the answer, and gives `correct` (key facts of the reference, no contradiction; for unanswerable, a proper refusal) and `supported` (every claim is in the retrieved passages; outside knowledge counts as unsupported even if true). Full rubric in `evaluate.py`. [TODO: say why you chose this rubric.]
 
-Agreement with my labels (`eval/human_labels.csv`, [TODO] answers graded before reading the judge): correct [TODO]%, supported [TODO]% (Cohen's kappa [TODO]). Disagreements: [TODO].
+Agreement with my labels (`eval/human_labels.csv`, 22 answers graded before reading the judge): correct 91%, supported 96% (Cohen's kappa 0.0 for both: the judge marked all 22 as correct, and I marked all 22 as supported, so one side never varies and kappa cannot measure agreement beyond chance; the percentages are more useful here). Disagreements: correct on q18 and q28 (I gave 0, the judge gave 1); supported on q30 (the judge gave 0, I gave 1). [TODO: explain in your own words why you and the judge disagree on these three.]
 
-Results: [TODO from eval/summary.md: correct x/32, correct refusals x/6, wrong refusals x/32, unsupported x/38.]
+Results (judge, eval/summary.md): correct on 32/32 answerable questions, correct refusals 6/6, answered an unanswerable question 0/6, wrong refusals 0/32, answers with an unsupported claim 1/38 (q30). Model note: the free-tier daily limit of gemini-3.6-flash ran out during the evaluation, so q01-q04 were answered with gemini-3.6-flash and all other answers, plus every judge verdict, with gemini-3.5-flash-lite.
 
 ## Failures
 
@@ -102,7 +102,7 @@ Results: [TODO from eval/summary.md: correct x/32, correct refusals x/6, wrong r
 |---|---|---|
 | retrieval miss | | |
 | wrong answer from right passage | | |
-| unsupported claim | | |
+| unsupported claim | 1 | q30 (automatic cause, still to be checked) |
 | wrong refusal | | |
 | bad test question | | |
 
@@ -112,7 +112,7 @@ What to fix first: [TODO]
 
 [TODO: your decision. Would you let the compliance lead rely on it, for what, with which safeguard?]
 
-Cost and latency per question: [TODO] tokens, [TODO] s, about $[TODO] at paid-tier prices (eval/summary.md).
+Cost and latency per question: 4433 tokens, 7.4 s, about $0.00187 at paid-tier prices (eval/summary.md).
 
 ## AI use
 
